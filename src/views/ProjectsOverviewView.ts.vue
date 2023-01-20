@@ -1,178 +1,54 @@
 <template>
   <div class="projects-overview">
-    <table class="projects-table">
-      <tr class="projects-table__header" :key="componentKey">
-        <th
-          @click="sortBy('id')"
-          :class="[sortedClass('id')]"
-          class="projects-table__header-cell projects-table__header-cell--sortable"
-        >
-          ID
-        </th>
-        <th
-          @click="sortBy('name')"
-          :class="[sortedClass('name')]"
-          class="projects-table__header-cell projects-table__header-cell--sortable"
-        >
-          Name
-        </th>
-        <th class="projects-table__header-cell">Source Language</th>
-        <th
-          @click="sortBy('status')"
-          :class="[sortedClass('status')]"
-          class="projects-table__header-cell projects-table__header-cell--sortable"
-        >
-          Status
-        </th>
-        <th class="projects-table__header-cell">Target Languages</th>
-        <th class="projects-table__header-cell">Date Created</th>
-        <th
-          @click="sortBy('dateDue')"
-          :class="[sortedClass('dateDue')]"
-          class="projects-table__header-cell projects-table__header-cell--sortable"
-        >
-          Date Due
-        </th>
-        <th class="projects-table__header-cell">Date Updated</th>
-      </tr>
-      <tr
-        v-for="project in filteredData"
-        :key="project.id"
-        class="projects-table__content"
-      >
-        <td class="projects-table__cell">{{ project.id }}</td>
-        <td class="projects-table__cell">{{ project.name }}</td>
-        <td class="projects-table__cell projects-table__cell--center">
-          {{ project.sourceLanguage }}
-        </td>
-        <td class="projects-table__cell projects-table__cell--center">
-          {{ project.status }}
-        </td>
-        <td class="projects-table__cell projects-table__cell--center">
-          {{ formatArray(project.targetLanguages) }}
-        </td>
-        <td class="projects-table__cell projects-table__cell--end">
-          {{ formatDate(project.dateCreated) }}
-        </td>
-        <td class="projects-table__cell projects-table__cell--end">
-          {{ formatDate(project.dateDue) }}
-        </td>
-        <td class="projects-table__cell projects-table__cell--end">
-          {{ formatDate(project.dateUpdated) }}
-        </td>
-      </tr>
-    </table>
+    <div class="projects-overview__filters">
+      <NameFilterComponent v-model="filters.name" />
+      <StatusFilterComponent v-model="filters.status" />
+    </div>
+    <ProjectsTableComponent :filters="filters" />
+    <CustomButtonComponentVue class="projects-overview__create-btn"
+      >New project</CustomButtonComponentVue
+    >
+    <OverviewComponent />
   </div>
 </template>
 
 <script setup lang="ts">
-  import { useFormatArray } from "@/composables/formatArray.composable";
-  import { useFormatDate } from "@/composables/formatDate.composable";
-  import type { IProject } from "@/models/project.interface";
-  import { ProjectStatus } from "@/models/projectStatus.enum";
-  import { useProjectsStore } from "@/stores/projects.store";
-  import { computed, onMounted, ref, type Ref } from "vue";
-  const { projects } = useProjectsStore();
-  const { formatDate } = useFormatDate();
-  const { formatArray } = useFormatArray();
-  let filteredData: Ref<IProject[]> = ref([]);
-  let sortedAsc = true;
-  let sortedBy: keyof IProject = "id";
-
-  const componentKey = ref(0);
-
-  const forceRerender = () => {
-    componentKey.value += 1;
-  };
-
-  const sortsedClass = computed((prop: keyof IProject) => ({
-    "projects-table__header-cell--ascending": false,
-    "projects-table__header-cell--descending": false,
-  }));
-
-  onMounted(() => {
-    filteredData.value = projects ?? [];
+  import CustomButtonComponentVue from "@/components/CustomButtonComponent.vue";
+  import NameFilterComponent from "@/components/NameFilterComponent.vue";
+  import OverviewComponent from "@/components/OverviewComponent.vue";
+  import ProjectsTableComponent from "@/components/ProjectsTableComponent.vue";
+  import StatusFilterComponent from "@/components/StatusFilterComponent.vue";
+  import { onMounted, ref, watch } from "vue";
+  const filters = ref({
+    name: "",
+    status: null,
   });
 
-  const sortBy = (prop: keyof IProject) => {
-    if (sortedBy === prop && sortedAsc === true) {
-      sortedAsc = false;
-      sortedBy = prop;
-      filteredData.value.sort((x, y) => (x[prop] > y[prop] ? -1 : 1));
-      forceRerender();
-    } else {
-      sortedAsc = true;
-      sortedBy = prop;
-      filteredData.value.sort((x, y) => (x[prop] < y[prop] ? -1 : 1));
-      forceRerender();
-    }
-  };
-
-  const sortedClass = (prop: keyof IProject) => {
-    return {
-      "projects-table__header-cell--ascending":
-        prop === sortedBy && sortedAsc === true,
-      "projects-table__header-cell--descending":
-        prop === sortedBy && sortedAsc === false,
-    };
-  };
+  onMounted(() => {
+    watch(filters.value, (val) => {
+      console.log(val);
+    });
+  });
 </script>
 
 <style lang="scss" scoped>
   .projects-overview {
     display: flex;
     overflow: auto;
-  }
-  .projects-table {
-    flex: 1;
+    flex-direction: column;
 
-    &__header {
-      background-color: var(--black);
+    &__filters {
       color: var(--white);
-    }
-
-    &__header-cell {
-      padding: 0.5rem 0;
-
-      &--sortable {
-        text-decoration: underline;
-        cursor: pointer;
-      }
-
-      &--ascending {
-        &::after {
-          content: "ASC";
-        }
-      }
-
-      &--descending {
-        &::after {
-          content: "DSC";
-        }
-      }
-    }
-
-    &__content {
-      &:nth-child(odd) {
-        background-color: var(--light-gray);
-      }
-
-      &:hover {
-        background-color: var(--teal);
-      }
-    }
-
-    &__cell {
-      white-space: nowrap;
+      margin-left: auto;
       padding: 0.5rem;
+      background-color: var(--black);
+      gap: 0.5rem;
+      display: flex;
+    }
 
-      &--center {
-        text-align: center;
-      }
-
-      &--end {
-        text-align: end;
-      }
+    &__create-btn {
+      margin-top: 1rem;
+      margin-left: auto;
     }
   }
 </style>

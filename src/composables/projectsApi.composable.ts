@@ -7,7 +7,12 @@ export const useProjectsApi = (axios: AxiosInstance) => {
   const getProjects = async (): Promise<IProject[]> => {
     const response = await axios.get(baseUrl);
 
-    return response.data._embedded.projects;
+    return (response.data._embedded.projects as IProject[]).map((project) => ({
+      ...project,
+      dateCreated: new Date(project.dateCreated),
+      dateDue: new Date(project.dateDue),
+      dateUpdated: new Date(project.dateUpdated),
+    }));
   };
 
   const createProject = async (project: IProject) => {

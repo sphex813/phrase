@@ -1,5 +1,5 @@
 @import "./base.css";
 
-/* #app {
-  display: flex;
-} */
+#app {
+  padding: 2rem;
+}

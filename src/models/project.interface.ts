@@ -6,7 +6,7 @@ export interface IProject {
   name: string;
   sourceLanguage: string;
   status: ProjectStatus;
-  targetLanguages: string[]; //TODO unique
+  targetLanguages: string[];
   dateCreated: Date;
   dateUpdated: Date;
   dateDue: Date;
