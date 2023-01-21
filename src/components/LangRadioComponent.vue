@@ -22,38 +22,38 @@
 </template>
 
 <script setup lang="ts">
-  import { useVModel } from "@vueuse/core";
-  const props = defineProps<{ modelValue: boolean }>();
-  const emit = defineEmits(["update:modelValue"]);
-  const value = useVModel(props, "modelValue", emit);
+import { useVModel } from "@vueuse/core";
+const props = defineProps<{ modelValue: boolean }>();
+const emit = defineEmits(["update:modelValue"]);
+const value = useVModel(props, "modelValue", emit);
 </script>
 
 <style lang="scss" scoped>
-  .lang-radio {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
+.lang-radio {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
 
-    &__button {
-      text-align: center;
+  &__button {
+    text-align: center;
 
-      & input + span {
-        padding: 0.5rem 1rem;
-        display: block;
-        border-radius: 2rem;
-      }
+    & input + span {
+      padding: 0.5rem 1rem;
+      display: block;
+      border-radius: 2rem;
+    }
 
-      & input:checked + span {
-        border: 2px solid var(--black);
-      }
+    & input:checked + span {
+      border: 2px solid var(--black);
+    }
 
-      &--orange span {
-        background-color: var(--orange);
-      }
+    &--orange span {
+      background-color: var(--orange);
+    }
 
-      &--teal span {
-        background-color: var(--teal);
-      }
+    &--teal span {
+      background-color: var(--teal);
     }
   }
+}
 </style>

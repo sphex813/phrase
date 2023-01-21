@@ -41,22 +41,24 @@
         <TableContentCellComponent>{{
           project.name
         }}</TableContentCellComponent>
-        <TableContentCellComponent position="CENTER">{{
+        <TableContentCellComponent>{{
           project.sourceLanguage
         }}</TableContentCellComponent>
-        <TableContentCellComponent position="CENTER">{{
+        <TableContentCellComponent>{{
           project.status
         }}</TableContentCellComponent>
-        <TableContentCellComponent position="CENTER">
-          {{ formatArray(project.targetLanguages) }}</TableContentCellComponent
+        <TableContentCellComponent class="projects-table__item--break">
+          {{
+            formatArray(project.targetLanguages, 6)
+          }}</TableContentCellComponent
         >
-        <TableContentCellComponent position="END">
+        <TableContentCellComponent>
           {{ formatDate(project.dateCreated) }}</TableContentCellComponent
         >
-        <TableContentCellComponent position="END">
+        <TableContentCellComponent>
           {{ formatDate(project.dateDue) }}</TableContentCellComponent
         >
-        <TableContentCellComponent position="END">
+        <TableContentCellComponent>
           {{ formatDate(project.dateUpdated) }}</TableContentCellComponent
         >
         <TableContentCellComponent
@@ -73,72 +75,78 @@
 </template>
 
 <script setup lang="ts">
-  import TableHeaderCellComponent from "@/components/TableHeaderCellComponent.vue";
-  import { useFormatArray } from "@/composables/formatArray.composable";
-  import { useFormatDate } from "@/composables/formatDate.composable";
-  import { useProjectsSort } from "@/composables/projectsSort.composable";
-  import type { IProject } from "@/models/project.interface";
-  import type { ProjectStatus } from "@/models/projectStatus.enum";
-  import router from "@/router";
-  import { useProjectsStore } from "@/stores/projects.store";
-  import { storeToRefs } from "pinia";
-  import { computed } from "vue";
-  import TableContentCellComponent from "./TableContentCellComponent.vue";
-  const { projects } = storeToRefs(useProjectsStore());
-  const { formatDate } = useFormatDate();
-  const { formatArray } = useFormatArray();
-  const { sortBy, appliedSort, sortProjects } = useProjectsSort();
-  const props = defineProps<{
-    filters: { name: string; status: ProjectStatus | null };
-  }>();
+import TableHeaderCellComponent from "@/components/TableHeaderCellComponent.vue";
+import { useFormatArray } from "@/composables/formatArray.composable";
+import { useFormatDate } from "@/composables/formatDate.composable";
+import { useProjectsSort } from "@/composables/projectsSort.composable";
+import type { IProject } from "@/models/project.interface";
+import type { ProjectStatus } from "@/models/projectStatus.enum";
+import router from "@/router";
+import { useProjectsStore } from "@/stores/projects.store";
+import { storeToRefs } from "pinia";
+import { computed } from "vue";
+import TableContentCellComponent from "./TableContentCellComponent.vue";
+const { projects } = storeToRefs(useProjectsStore());
+const { formatDate } = useFormatDate();
+const { formatArray } = useFormatArray();
+const { sortBy, appliedSort, sortProjects } = useProjectsSort();
+const props = defineProps<{
+  filters: { name: string; status: ProjectStatus | null };
+}>();
 
-  const filteredData = computed(() => {
-    const allProjects: IProject[] = projects.value ?? [];
-    sortProjects(allProjects);
+const filteredData = computed(() => {
+  const allProjects: IProject[] = projects.value ?? [];
+  sortProjects(allProjects);
 
-    return allProjects.filter(
-      (project) =>
-        project.name.toLowerCase().includes(props.filters.name.toLowerCase()) &&
-        (!props.filters.status || project.status === props.filters.status)
-    );
-  });
+  return allProjects.filter(
+    (project) =>
+      project.name.toLowerCase().includes(props.filters.name.toLowerCase()) &&
+      (!props.filters.status || project.status === props.filters.status)
+  );
+});
 
-  const editProject = (project: IProject) => {
-    router.push({ name: "project", params: { id: project.id } });
-  };
+const editProject = (project: IProject) => {
+  router.push({ name: "project", params: { id: project.id } });
+};
 </script>
 
 <style lang="scss" scoped>
-  .table-container {
-    overflow: auto;
-    display: flex;
+.table-container {
+  overflow: auto;
+  display: flex;
+}
+.projects-table {
+  flex: 1;
+
+  & tbody {
+    display: table;
+    width: 100%;
   }
-  .projects-table {
-    flex: 1;
 
-    & tbody {
-      display: table;
-      width: 100%;
+  &__header {
+    background-color: var(--black);
+    color: var(--white);
+  }
+
+  &__content {
+    &:nth-child(odd) {
+      background-color: var(--light-gray);
     }
 
-    &__header {
-      background-color: var(--black);
-      color: var(--white);
-    }
-
-    &__content {
-      &:nth-child(odd) {
-        background-color: var(--light-gray);
-      }
-
-      &:hover {
-        background-color: var(--teal);
-      }
-    }
-
-    &__edit-button {
-      text-decoration: underline;
-      cursor: pointer;
+    &:hover {
+      background-color: var(--teal);
     }
   }
+
+  &__item {
+    &--break {
+      white-space: pre;
+    }
+  }
+
+  &__edit-button {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}
 </style>

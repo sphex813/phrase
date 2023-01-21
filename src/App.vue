@@ -1,12 +1,12 @@
 <script setup lang="ts">
-  import { onMounted } from "vue";
-  import { RouterView } from "vue-router";
-  import { useProjectsStore } from "./stores/projects.store";
-  const { getProjects } = useProjectsStore();
+import { onMounted } from "vue";
+import { RouterView } from "vue-router";
+import { useProjectsStore } from "./stores/projects.store";
+const { getProjects } = useProjectsStore();
 
-  onMounted(() => {
-    getProjects();
-  });
+onMounted(() => {
+  getProjects();
+});
 </script>
 
 <template>

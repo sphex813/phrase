@@ -1,4 +1,5 @@
 import type { AxiosInstance } from "axios";
+import dayjs from "dayjs";
 import type { IProject } from "./../models/project.interface";
 
 export const useProjectsApi = (axios: AxiosInstance) => {
@@ -12,7 +13,8 @@ export const useProjectsApi = (axios: AxiosInstance) => {
 
   const createProject = async (project: IProject) => {
     const result = await axios.post(baseUrl, project);
-    console.log(result.data);
+
+    return mapProject(result.data as IProject);
   };
 
   const updateProject = async (project: IProject) => {
@@ -24,9 +26,9 @@ export const useProjectsApi = (axios: AxiosInstance) => {
   const mapProject = (project: IProject) => {
     return {
       ...project,
-      dateCreated: new Date(project.dateCreated),
-      dateDue: new Date(project.dateDue),
-      dateUpdated: new Date(project.dateUpdated),
+      dateCreated: dayjs(project.dateCreated).toDate(),
+      dateDue: dayjs(project.dateDue).toDate(),
+      dateUpdated: dayjs(project.dateUpdated).toDate(),
     };
   };
 

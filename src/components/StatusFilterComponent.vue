@@ -11,11 +11,11 @@
 </template>
 
 <script setup lang="ts">
-  import type { ProjectStatus } from "@/models/projectStatus.enum";
-  import { useVModel } from "@vueuse/core";
-  const props = defineProps<{ modelValue: ProjectStatus | null }>();
-  const emit = defineEmits(["update:modelValue"]);
-  const value = useVModel(props, "modelValue", emit);
+import type { ProjectStatus } from "@/models/projectStatus.enum";
+import { useVModel } from "@vueuse/core";
+const props = defineProps<{ modelValue: ProjectStatus | null }>();
+const emit = defineEmits(["update:modelValue"]);
+const value = useVModel(props, "modelValue", emit);
 </script>
 
 <style lang="scss" scoped></style>

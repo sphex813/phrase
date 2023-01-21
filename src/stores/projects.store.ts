@@ -2,6 +2,7 @@ import { useProjectsApi } from "@/composables/projectsApi.composable";
 import type { IProject } from "@/models/project.interface";
 import type { ProjectStatus } from "@/models/projectStatus.enum";
 import { useNow } from "@vueuse/core";
+import dayjs from "dayjs";
 import { defineStore, getActivePinia } from "pinia";
 import { computed, ref, type Ref } from "vue";
 import { useMostFrequent } from "./../composables/mostFrequent.composable";
@@ -25,7 +26,7 @@ export const useProjectsStore = defineStore("projectsStore", () => {
   };
 
   const updateProject = async (project: IProject) => {
-    project.dateUpdated = new Date();
+    project.dateUpdated = dayjs().toDate();
     const projectResponse = await updateProjectApi(project);
     var index = projects.value?.findIndex(
       (project) => project.id === projectResponse.id
@@ -33,6 +34,15 @@ export const useProjectsStore = defineStore("projectsStore", () => {
     if (index != null && index !== -1 && projects.value) {
       projects.value[index] = projectResponse;
     }
+
+    return true;
+  };
+
+  const createProject = async (project: IProject) => {
+    const projectResponse = await createProjectApi(project);
+    projects.value?.push(projectResponse);
+
+    return true;
   };
 
   const totalProjects = computed(() => {
@@ -65,6 +75,7 @@ export const useProjectsStore = defineStore("projectsStore", () => {
     mostProminentLang,
     getProjects,
     updateProject,
+    createProject,
     projectsCountByStatus,
   };
 });

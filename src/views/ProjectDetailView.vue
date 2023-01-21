@@ -6,9 +6,10 @@
         class="detail-container__button"
         >Back</CustomButtonComponent
       >
-      <h2 class="detail-container__title">
+      <h2 v-if="isEdit" class="detail-container__title">
         Edit project with ID {{ projectCopy.id }}
       </h2>
+      <h2 v-if="!isEdit" class="detail-container__title">Create new project</h2>
     </div>
 
     <ProjectDetailComponent v-model="projectCopy" />
@@ -19,81 +20,81 @@
 </template>
 
 <script setup lang="ts">
-  import CustomButtonComponent from "@/components/CustomButtonComponent.vue";
-  import ProjectDetailComponent from "@/components/ProjectDetailComponent.vue";
-  import { useCompareProjects } from "@/composables/compareProjects.composable";
-  import type { IProject } from "@/models/project.interface";
-  import router from "@/router";
-  import { useProjectsStore } from "@/stores/projects.store";
-  import cloneDeep from "lodash.clonedeep";
-  import { ref, unref } from "vue";
-  import { useRoute } from "vue-router";
-  const { projects, updateProject } = useProjectsStore();
-  const route = useRoute();
-  const { projectsEquals } = useCompareProjects();
-  const originalProject = projects?.find(
-    (project) => project.id === Number(route.params.id)
-  ) as IProject;
+import CustomButtonComponent from "@/components/CustomButtonComponent.vue";
+import ProjectDetailComponent from "@/components/ProjectDetailComponent.vue";
+import { useValidation } from "@/composables/validateProject.composable";
+import type { IProject } from "@/models/project.interface";
+import { ProjectStatus } from "@/models/projectStatus.enum";
+import router from "@/router";
+import { useProjectsStore } from "@/stores/projects.store";
+import dayjs from "dayjs";
+import cloneDeep from "lodash.clonedeep";
+import { computed, ref } from "vue";
+import { useRoute } from "vue-router";
+const { projects, updateProject, createProject } = useProjectsStore();
+const route = useRoute();
+const { validate } = useValidation();
+const originalProject = (projects?.find(
+  (project) => project.id === Number(route.params.id)
+) as IProject) ?? {
+  id: 0,
+  name: "",
+  sourceLanguage: "",
+  status: ProjectStatus.NEW,
+  targetLanguages: [],
+  dateCreated: dayjs(),
+  dateUpdated: dayjs(),
+  dateDue: dayjs().add(1, "day"),
+};
 
-  const projectCopy = ref(cloneDeep(originalProject));
+const projectCopy = ref(cloneDeep(originalProject));
 
-  const navigateBack = () => {
-    router.push({ name: "projects" });
-  };
+const isEdit = computed(() => {
+  return projectCopy.value.id !== 0;
+});
 
-  const save = async () => {
-    const valid = validate();
+const navigateBack = () => {
+  router.push({ name: "projects" });
+};
 
-    if (valid) {
+const save = async () => {
+  const valid = validate(originalProject, projectCopy);
+
+  if (valid) {
+    if (isEdit.value) {
       await updateProject(projectCopy.value);
-      navigateBack();
+    } else {
+      await createProject(projectCopy.value);
     }
-  };
-
-  const validate = () => {
-    if (!projectCopy.value.name) {
-      alert("Name is required!");
-      return false;
-    }
-
-    if (!projectCopy.value.sourceLanguage) {
-      alert("Source language is requred!");
-      return false;
-    }
-
-    if (projectsEquals(unref(originalProject), unref(projectCopy))) {
-      alert("Project was not changed!");
-      return false;
-    }
-
-    return true;
-  };
+    navigateBack();
+  }
+};
 </script>
 
 <style lang="scss" scoped>
-  .detail-container {
+.detail-container {
+  display: flex;
+  flex-direction: column;
+
+  &__button {
+    align-self: flex-start;
+  }
+
+  &__header {
     display: flex;
-    flex-direction: column;
+    align-items: center;
+  }
 
+  &__title {
+    margin: 0 0 0 2rem;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .detail-container {
     &__button {
-      align-self: flex-start;
-    }
-
-    &__header {
-      display: flex;
-      align-items: center;
-    }
-
-    &__title {
-      margin: 0 0 0 2rem;
+      align-self: stretch;
     }
   }
-
-  @media only screen and (max-width: 600px) {
-    .detail-container {
-      &__button {
-        align-self: stretch;
-      }
-    }
-  }
+}
 </style>

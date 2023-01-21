@@ -1,4 +1,3 @@
-import { useProjectsStore } from "@/stores/projects.store";
 import { createRouter, createWebHistory } from "vue-router";
 
 const router = createRouter({
@@ -10,16 +9,14 @@ const router = createRouter({
       component: () => import("../views/ProjectsOverviewView.ts.vue"),
     },
     {
+      path: "/project",
+      name: "projectNew",
+      component: () => import("../views/ProjectDetailView.vue"),
+    },
+    {
       path: "/project/:id",
       name: "project",
       component: () => import("../views/ProjectDetailView.vue"),
-      beforeEnter: (to) => {
-        //TODO nefunguje refresh
-        const { projects } = useProjectsStore();
-        if (!projects?.find((project) => project.id === Number(to.params.id))) {
-          return { name: "projects" };
-        }
-      },
     },
     {
       path: "/:pathMatch(.*)*",

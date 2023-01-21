@@ -2,7 +2,7 @@
   <td
     class="content-cell"
     :class="{
-      'content-cell--center': position === 'CENTER',
+      'content-cell--start': position === 'START',
       'content-cell--end': position === 'END',
     }"
   >
@@ -11,22 +11,23 @@
 </template>
 
 <script setup lang="ts">
-  defineProps<{
-    position?: "CENTER" | "END";
-  }>();
+defineProps<{
+  position?: "START" | "END";
+}>();
 </script>
 
 <style lang="scss" scoped>
-  .content-cell {
-    white-space: nowrap;
-    padding: 0.5rem;
+.content-cell {
+  white-space: nowrap;
+  padding: 0.5rem;
+  text-align: center;
 
-    &--center {
-      text-align: center;
-    }
-
-    &--end {
-      text-align: end;
-    }
+  &--start {
+    text-align: start;
   }
+
+  &--end {
+    text-align: end;
+  }
+}
 </style>
