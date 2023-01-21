@@ -1,70 +1,75 @@
 <template>
-  <table class="projects-table">
-    <tr class="projects-table__header">
-      <TableHeaderCellComponent
-        sortByProperty="id"
-        :appliedSort="appliedSort"
-        @on-click="sortBy"
-        >ID</TableHeaderCellComponent
+  <div class="table-container">
+    <table class="projects-table">
+      <tr class="projects-table__header">
+        <TableHeaderCellComponent
+          sortByProperty="id"
+          :appliedSort="appliedSort"
+          @on-click="sortBy"
+          >ID</TableHeaderCellComponent
+        >
+        <TableHeaderCellComponent
+          sortByProperty="name"
+          :appliedSort="appliedSort"
+          @on-click="sortBy"
+          >Name</TableHeaderCellComponent
+        >
+        <TableHeaderCellComponent>Source Language</TableHeaderCellComponent>
+        <TableHeaderCellComponent
+          sortByProperty="status"
+          :appliedSort="appliedSort"
+          @on-click="sortBy"
+          >Status</TableHeaderCellComponent
+        >
+        <TableHeaderCellComponent>Target Language</TableHeaderCellComponent>
+        <TableHeaderCellComponent>Date Created</TableHeaderCellComponent>
+        <TableHeaderCellComponent
+          sortByProperty="dateDue"
+          :appliedSort="appliedSort"
+          @on-click="sortBy"
+          >Date Due</TableHeaderCellComponent
+        >
+        <TableHeaderCellComponent>Date Updated</TableHeaderCellComponent>
+        <TableHeaderCellComponent>Action</TableHeaderCellComponent>
+      </tr>
+      <tr
+        v-for="project in filteredData"
+        :key="project.id"
+        class="projects-table__content"
       >
-      <TableHeaderCellComponent
-        sortByProperty="name"
-        :appliedSort="appliedSort"
-        @on-click="sortBy"
-        >Name</TableHeaderCellComponent
-      >
-      <TableHeaderCellComponent>Source Language</TableHeaderCellComponent>
-      <TableHeaderCellComponent
-        sortByProperty="status"
-        :appliedSort="appliedSort"
-        @on-click="sortBy"
-        >Status</TableHeaderCellComponent
-      >
-      <TableHeaderCellComponent>Target Language</TableHeaderCellComponent>
-      <TableHeaderCellComponent>Date Created</TableHeaderCellComponent>
-      <TableHeaderCellComponent
-        sortByProperty="dateDue"
-        :appliedSort="appliedSort"
-        @on-click="sortBy"
-        >Date Due</TableHeaderCellComponent
-      >
-      <TableHeaderCellComponent>Date Updated</TableHeaderCellComponent>
-      <TableHeaderCellComponent>Action</TableHeaderCellComponent>
-    </tr>
-    <tr
-      v-for="project in filteredData"
-      :key="project.id"
-      class="projects-table__content"
-    >
-      <TableContentCellComponent>{{ project.id }}</TableContentCellComponent>
-      <TableContentCellComponent>{{ project.name }}</TableContentCellComponent>
-      <TableContentCellComponent position="CENTER">{{
-        project.sourceLanguage
-      }}</TableContentCellComponent>
-      <TableContentCellComponent position="CENTER">{{
-        project.status
-      }}</TableContentCellComponent>
-      <TableContentCellComponent position="CENTER">
-        {{ formatArray(project.targetLanguages) }}</TableContentCellComponent
-      >
-      <TableContentCellComponent position="END">
-        {{ formatDate(project.dateCreated) }}</TableContentCellComponent
-      >
-      <TableContentCellComponent position="END">
-        {{ formatDate(project.dateDue) }}</TableContentCellComponent
-      >
-      <TableContentCellComponent position="END">
-        {{ formatDate(project.dateUpdated) }}</TableContentCellComponent
-      >
-      <TableContentCellComponent
-        class="projects-table__edit-button"
-        position="END"
-        @click="editProject(project)"
-      >
-        EDIT</TableContentCellComponent
-      >
-    </tr>
-  </table>
+        <TableContentCellComponent>{{ project.id }}</TableContentCellComponent>
+        <TableContentCellComponent>{{
+          project.name
+        }}</TableContentCellComponent>
+        <TableContentCellComponent position="CENTER">{{
+          project.sourceLanguage
+        }}</TableContentCellComponent>
+        <TableContentCellComponent position="CENTER">{{
+          project.status
+        }}</TableContentCellComponent>
+        <TableContentCellComponent position="CENTER">
+          {{ formatArray(project.targetLanguages) }}</TableContentCellComponent
+        >
+        <TableContentCellComponent position="END">
+          {{ formatDate(project.dateCreated) }}</TableContentCellComponent
+        >
+        <TableContentCellComponent position="END">
+          {{ formatDate(project.dateDue) }}</TableContentCellComponent
+        >
+        <TableContentCellComponent position="END">
+          {{ formatDate(project.dateUpdated) }}</TableContentCellComponent
+        >
+        <TableContentCellComponent
+          v-if="project.status !== 'COMPLETED'"
+          class="projects-table__edit-button"
+          position="END"
+          @click="editProject(project)"
+        >
+          EDIT</TableContentCellComponent
+        >
+      </tr>
+    </table>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -74,6 +79,7 @@
   import { useProjectsSort } from "@/composables/projectsSort.composable";
   import type { IProject } from "@/models/project.interface";
   import type { ProjectStatus } from "@/models/projectStatus.enum";
+  import router from "@/router";
   import { useProjectsStore } from "@/stores/projects.store";
   import { storeToRefs } from "pinia";
   import { computed } from "vue";
@@ -98,13 +104,22 @@
   });
 
   const editProject = (project: IProject) => {
-    console.log("edit", project);
+    router.push({ name: "project", params: { id: project.id } });
   };
 </script>
 
 <style lang="scss" scoped>
+  .table-container {
+    overflow: auto;
+    display: flex;
+  }
   .projects-table {
     flex: 1;
+
+    & tbody {
+      display: table;
+      width: 100%;
+    }
 
     &__header {
       background-color: var(--black);

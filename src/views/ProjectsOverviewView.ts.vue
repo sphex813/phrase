@@ -18,23 +18,16 @@
   import OverviewComponent from "@/components/OverviewComponent.vue";
   import ProjectsTableComponent from "@/components/ProjectsTableComponent.vue";
   import StatusFilterComponent from "@/components/StatusFilterComponent.vue";
-  import { onMounted, ref, watch } from "vue";
+  import { ref } from "vue";
   const filters = ref({
     name: "",
     status: null,
-  });
-
-  onMounted(() => {
-    watch(filters.value, (val) => {
-      console.log(val);
-    });
   });
 </script>
 
 <style lang="scss" scoped>
   .projects-overview {
     display: flex;
-    overflow: auto;
     flex-direction: column;
 
     &__filters {

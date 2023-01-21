@@ -1,10 +1,10 @@
-import { useMostFrequent } from "./../composables/mostFrequent.composable";
 import { useProjectsApi } from "@/composables/projectsApi.composable";
 import type { IProject } from "@/models/project.interface";
+import type { ProjectStatus } from "@/models/projectStatus.enum";
+import { useNow } from "@vueuse/core";
 import { defineStore, getActivePinia } from "pinia";
 import { computed, ref, type Ref } from "vue";
-import { useNow } from "@vueuse/core";
-import type { ProjectStatus } from "@/models/projectStatus.enum";
+import { useMostFrequent } from "./../composables/mostFrequent.composable";
 
 export const useProjectsStore = defineStore("projectsStore", () => {
   const now = useNow({ interval: 60000 }); //refresh after 1 minuts
@@ -12,10 +12,8 @@ export const useProjectsStore = defineStore("projectsStore", () => {
   const axios = getActivePinia()?.axios!;
   const {
     getProjects: getProjectsApi,
-    getProject: getProjectApi,
     createProject: createProjectApi,
     updateProject: updateProjectApi,
-    deleteProject: deleteProjectApi,
   } = useProjectsApi(axios);
 
   const projects: Ref<IProject[] | null> = ref(null);
@@ -24,6 +22,17 @@ export const useProjectsStore = defineStore("projectsStore", () => {
     //todo handle errors
     const projectsResponse = await getProjectsApi();
     projects.value = projectsResponse;
+  };
+
+  const updateProject = async (project: IProject) => {
+    project.dateUpdated = new Date();
+    const projectResponse = await updateProjectApi(project);
+    var index = projects.value?.findIndex(
+      (project) => project.id === projectResponse.id
+    );
+    if (index != null && index !== -1 && projects.value) {
+      projects.value[index] = projectResponse;
+    }
   };
 
   const totalProjects = computed(() => {
@@ -51,10 +60,11 @@ export const useProjectsStore = defineStore("projectsStore", () => {
 
   return {
     projects,
-    getProjects,
     totalProjects,
     pastDueDate,
     mostProminentLang,
+    getProjects,
+    updateProject,
     projectsCountByStatus,
   };
 });

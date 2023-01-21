@@ -1,6 +1,6 @@
 export const useFormatArray = () => {
-  const formatArray = (arrary: string[]): string => {
-    return arrary.join(", ");
+  const formatArray = (arrary: string[] | undefined): string => {
+    return arrary?.join(", ") ?? "";
   };
 
   return { formatArray };

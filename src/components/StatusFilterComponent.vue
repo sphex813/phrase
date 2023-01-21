@@ -12,19 +12,10 @@
 
 <script setup lang="ts">
   import type { ProjectStatus } from "@/models/projectStatus.enum";
-  import { computed } from "vue";
-
-  const props = defineProps(["modelValue"]);
+  import { useVModel } from "@vueuse/core";
+  const props = defineProps<{ modelValue: ProjectStatus | null }>();
   const emit = defineEmits(["update:modelValue"]);
-
-  const value = computed({
-    get() {
-      return props.modelValue;
-    },
-    set(value: ProjectStatus | null) {
-      emit("update:modelValue", value);
-    },
-  });
+  const value = useVModel(props, "modelValue", emit);
 </script>
 
 <style lang="scss" scoped></style>

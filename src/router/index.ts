@@ -1,3 +1,4 @@
+import { useProjectsStore } from "@/stores/projects.store";
 import { createRouter, createWebHistory } from "vue-router";
 
 const router = createRouter({
@@ -10,8 +11,19 @@ const router = createRouter({
     },
     {
       path: "/project/:id",
+      name: "project",
       component: () => import("../views/ProjectDetailView.vue"),
-      //pouzit navigation guard
+      beforeEnter: (to) => {
+        //TODO nefunguje refresh
+        const { projects } = useProjectsStore();
+        if (!projects?.find((project) => project.id === Number(to.params.id))) {
+          return { name: "projects" };
+        }
+      },
+    },
+    {
+      path: "/:pathMatch(.*)*",
+      redirect: { name: "projects" },
     },
   ],
 });

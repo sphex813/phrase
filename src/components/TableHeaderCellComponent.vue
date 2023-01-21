@@ -65,5 +65,13 @@
         content: " DSC";
       }
     }
+
+    &:first-child {
+      padding-left: 0.5rem;
+    }
+
+    &:last-child {
+      padding-right: 0.5rem;
+    }
   }
 </style>
