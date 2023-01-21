@@ -13,9 +13,14 @@
     </div>
 
     <ProjectDetailComponent v-model="projectCopy" />
-    <CustomButtonComponent @click="save()" class="detail-container__button"
-      >Save project</CustomButtonComponent
+    <CustomButtonComponent
+      :disabled="loading"
+      @click="save()"
+      class="detail-container__button"
     >
+      <span v-if="!loading">Save project</span>
+      <span v-if="loading">Loading..</span>
+    </CustomButtonComponent>
   </div>
 </template>
 
@@ -33,20 +38,22 @@ import { computed, ref } from "vue";
 import { useRoute } from "vue-router";
 const { projects, updateProject, createProject } = useProjectsStore();
 const route = useRoute();
+const loading = ref(false);
 const { validate } = useValidation();
-const originalProject = (projects?.find(
-  (project) => project.id === Number(route.params.id)
-) as IProject) ?? {
+const newProject: IProject = {
   id: 0,
   name: "",
   sourceLanguage: "",
   status: ProjectStatus.NEW,
   targetLanguages: [],
-  dateCreated: dayjs(),
-  dateUpdated: dayjs(),
-  dateDue: dayjs().add(1, "day"),
+  dateCreated: dayjs().toDate(),
+  dateUpdated: dayjs().toDate(),
+  dateDue: dayjs().add(1, "day").toDate(),
 };
-
+const originalProject =
+  (projects?.find(
+    (project) => project.id === Number(route.params.id)
+  ) as IProject) ?? newProject;
 const projectCopy = ref(cloneDeep(originalProject));
 
 const isEdit = computed(() => {
@@ -61,12 +68,18 @@ const save = async () => {
   const valid = validate(originalProject, projectCopy);
 
   if (valid) {
+    let result: boolean;
+    loading.value = true;
+
     if (isEdit.value) {
-      await updateProject(projectCopy.value);
+      result = await updateProject(projectCopy.value);
     } else {
-      await createProject(projectCopy.value);
+      result = await createProject(projectCopy.value);
     }
-    navigateBack();
+    loading.value = false;
+    if (result) {
+      navigateBack();
+    }
   }
 };
 </script>

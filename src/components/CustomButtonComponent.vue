@@ -1,8 +1,12 @@
 <template>
-  <div class="custom-button"><slot></slot></div>
+  <div class="custom-button" :class="{ 'custom-button--disabled': disabled }">
+    <slot></slot>
+  </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+defineProps<{ disabled?: boolean }>();
+</script>
 
 <style lang="scss" scoped>
 .custom-button {
@@ -15,8 +19,11 @@
   background: var(--teal);
   border-radius: 0.7rem;
   box-shadow: 0 0.2rem 0.5rem rgb(0 0 0 / 20%);
-
   cursor: pointer;
+
+  &--disabled {
+    pointer-events: none;
+  }
 
   &:hover {
     box-shadow: none;

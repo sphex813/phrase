@@ -36,6 +36,7 @@ const value = useVModel(props, "modelValue", emit);
 
   &__button {
     text-align: center;
+    cursor: pointer;
 
     & input + span {
       padding: 0.5rem 1rem;

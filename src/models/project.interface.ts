@@ -1,4 +1,3 @@
-import type { IProjectLinks } from "./projectLinks.interface";
 import type { ProjectStatus } from "./projectStatus.enum";
 
 export interface IProject {
@@ -10,5 +9,4 @@ export interface IProject {
   dateCreated: Date;
   dateUpdated: Date;
   dateDue: Date;
-  _links: IProjectLinks;
 }

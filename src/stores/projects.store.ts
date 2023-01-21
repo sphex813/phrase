@@ -20,29 +20,45 @@ export const useProjectsStore = defineStore("projectsStore", () => {
   const projects: Ref<IProject[] | null> = ref(null);
 
   const getProjects = async () => {
-    //todo handle errors
-    const projectsResponse = await getProjectsApi();
-    projects.value = projectsResponse;
+    try {
+      const projectsResponse = await getProjectsApi();
+      projects.value = projectsResponse;
+    } catch (err) {
+      alert("Error while loading the projects!");
+      return false;
+    }
   };
 
   const updateProject = async (project: IProject) => {
-    project.dateUpdated = dayjs().toDate();
-    const projectResponse = await updateProjectApi(project);
-    var index = projects.value?.findIndex(
-      (project) => project.id === projectResponse.id
-    );
-    if (index != null && index !== -1 && projects.value) {
-      projects.value[index] = projectResponse;
-    }
+    try {
+      project.dateUpdated = dayjs().toDate();
+      const projectResponse = await updateProjectApi(project);
+      var index = projects.value?.findIndex(
+        (project) => project.id === projectResponse.id
+      );
+      if (index != null && index !== -1 && projects.value) {
+        projects.value[index] = projectResponse;
+      }
 
-    return true;
+      alert("Project was updated!");
+      return true;
+    } catch (err) {
+      alert("Error while updating the project!");
+      return false;
+    }
   };
 
   const createProject = async (project: IProject) => {
-    const projectResponse = await createProjectApi(project);
-    projects.value?.push(projectResponse);
+    try {
+      const projectResponse = await createProjectApi(project);
+      projects.value?.push(projectResponse);
 
-    return true;
+      alert("Project was created!");
+      return true;
+    } catch (err) {
+      alert("Error while creating the project!");
+      return false;
+    }
   };
 
   const totalProjects = computed(() => {
