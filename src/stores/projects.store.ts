@@ -4,7 +4,7 @@ import type { ProjectStatus } from "@/models/projectStatus.enum";
 import { useNow } from "@vueuse/core";
 import dayjs from "dayjs";
 import { defineStore, getActivePinia } from "pinia";
-import { computed, ref, type Ref } from "vue";
+import { computed, ref, type ComputedRef, type Ref } from "vue";
 import { useMostFrequent } from "./../composables/mostFrequent.composable";
 
 export const useProjectsStore = defineStore("projectsStore", () => {
@@ -19,17 +19,18 @@ export const useProjectsStore = defineStore("projectsStore", () => {
 
   const projects: Ref<IProject[] | null> = ref(null);
 
-  const getProjects = async () => {
+  const getProjects = async (): Promise<boolean> => {
     try {
       const projectsResponse = await getProjectsApi();
       projects.value = projectsResponse;
+      return true;
     } catch (err) {
       alert("Error while loading the projects!");
       return false;
     }
   };
 
-  const updateProject = async (project: IProject) => {
+  const updateProject = async (project: IProject): Promise<boolean> => {
     try {
       project.dateUpdated = dayjs().toDate();
       const projectResponse = await updateProjectApi(project);
@@ -48,7 +49,7 @@ export const useProjectsStore = defineStore("projectsStore", () => {
     }
   };
 
-  const createProject = async (project: IProject) => {
+  const createProject = async (project: IProject): Promise<boolean> => {
     try {
       const projectResponse = await createProjectApi(project);
       projects.value?.push(projectResponse);
@@ -61,24 +62,25 @@ export const useProjectsStore = defineStore("projectsStore", () => {
     }
   };
 
-  const totalProjects = computed(() => {
+  const totalProjects: ComputedRef<number> = computed(() => {
     return projects.value?.length ?? 0;
   });
 
-  const pastDueDate = computed(() => {
+  const pastDueDate: ComputedRef<number> = computed(() => {
     return (
       projects.value?.filter((project) => project.dateDue < now.value).length ??
       0
     );
   });
 
-  const mostProminentLang = computed(() => {
-    return mostFrequent(
-      projects.value?.map((project) => project.sourceLanguage)
+  const mostProminentLang: ComputedRef<string> = computed(() => {
+    return (
+      mostFrequent(projects.value?.map((project) => project.sourceLanguage)) ??
+      "not known"
     );
   });
 
-  const projectsCountByStatus = (status: ProjectStatus) => {
+  const projectsCountByStatus = (status: ProjectStatus): number => {
     return (
       projects.value?.filter((project) => project.status === status).length ?? 0
     );

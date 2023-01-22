@@ -11,13 +11,13 @@ export const useProjectsApi = (axios: AxiosInstance) => {
     return (response.data._embedded.projects as IProject[]).map(mapProject);
   };
 
-  const createProject = async (project: IProject) => {
+  const createProject = async (project: IProject): Promise<IProject> => {
     const result = await axios.post(baseUrl, project);
 
     return mapProject(result.data as IProject);
   };
 
-  const updateProject = async (project: IProject) => {
+  const updateProject = async (project: IProject): Promise<IProject> => {
     const result = await axios.put(`${baseUrl}/${project.id}`, project);
 
     return mapProject(result.data as IProject);
