@@ -1,6 +1,6 @@
 import type { IProject } from "@/models/project.interface";
 import type { IProjectSort } from "@/models/projectSort.Inteface";
-import { type Ref, ref } from "vue";
+import { ref, type Ref } from "vue";
 
 export const useProjectsSort = () => {
   const appliedSort: Ref<IProjectSort> = ref({
@@ -21,15 +21,23 @@ export const useProjectsSort = () => {
   };
 
   const sortProjects = (projects: IProject[]) => {
+    const sortProp = appliedSort.value.property;
     if (appliedSort.value.orderAsc) {
       projects?.sort((x, y) =>
-        x[appliedSort.value.property] < y[appliedSort.value.property] ? -1 : 1
+        valueToSort(x[sortProp]) < valueToSort(y[sortProp]) ? -1 : 1
       );
     } else {
       projects?.sort((x, y) =>
-        x[appliedSort.value.property] > y[appliedSort.value.property] ? -1 : 1
+        valueToSort(x[sortProp]) > valueToSort(y[sortProp]) ? -1 : 1
       );
     }
+  };
+
+  const valueToSort = (projectValue: string | number | string[] | Date) => {
+    if (typeof projectValue === "string") {
+      return projectValue.toLowerCase();
+    }
+    return projectValue;
   };
 
   return { appliedSort, sortBy, sortProjects };
